@@ -1,0 +1,43 @@
+<%= form_with(model: product, local: true) do |form| %>
+  <% if product.errors.any? %>
+    <div class="alert alert-danger">
+      <h4><%= pluralize(product.errors.count, "error") %> prohibieron guardar este producto:</h4>
+      <ul>
+        <% product.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="mb-3">
+    <%= form.label :sku, class: 'form-label' %>
+    <%= form.text_field :sku, class: 'form-control' %>
+    <div class="form-text">Códigos: EA (normal), WE (peso), SP (especial)</div>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :name, class: 'form-label' %>
+    <%= form.text_field :name, class: 'form-control' %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :description, class: 'form-label' %>
+    <%= form.text_area :description, class: 'form-control' %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :available_units, class: 'form-label' %>
+    <%= form.number_field :available_units, class: 'form-control' %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :unit_price, class: 'form-label' %>
+    <%= form.number_field :unit_price, step: 0.01, class: 'form-control' %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit class: 'btn btn-primary' %>
+    <%= link_to 'Cancelar', products_path, class: 'btn btn-secondary' %>
+  </div>
+<% end %>

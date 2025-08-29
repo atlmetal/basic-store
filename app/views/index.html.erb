@@ -1,0 +1,29 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Productos</h1>
+  <%= link_to 'Nuevo Producto', new_product_path, class: 'btn btn-primary' %>
+</div>
+
+<div class="row">
+  <% @products.each do |product| %>
+    <div class="col-md-4 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title"><%= product.name %></h5>
+          <p class="card-text">
+            <strong>SKU:</strong> <%= product.sku %><br>
+            <strong>Descripción:</strong> <%= product.description %><br>
+            <strong>Unidades:</strong> <%= product.available_units %><br>
+            <strong>Precio:</strong> $<%= product.unit_price %>
+          </p>
+          <div class="btn-group" role="group">
+            <%= link_to 'Ver', product, class: 'btn btn-outline-primary btn-sm' %>
+            <%= link_to 'Editar', edit_product_path(product), class: 'btn btn-outline-secondary btn-sm' %>
+            <%= link_to 'Eliminar', product, method: :delete, 
+                        confirm: '¿Está seguro?', 
+                        class: 'btn btn-outline-danger btn-sm' %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
