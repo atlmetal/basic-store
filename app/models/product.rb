@@ -17,7 +17,7 @@ class Product < ApplicationRecord
   end
 
   def retrieve_price_rule
-    @rules_manager ||= RulesManager.new
+    @rules_manager ||= RulesHandler.new
     @rules_manager.get_rule(sku)
   end
 end
