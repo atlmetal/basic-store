@@ -6,24 +6,77 @@
 <div class="row">
   <% @products.each do |product| %>
     <div class="col-md-4 mb-4">
-      <div class="card">
-        <div class="card-body">
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column">
           <h5 class="card-title"><%= product.name %></h5>
           <p class="card-text">
             <strong>SKU:</strong> <%= product.sku %><br>
             <strong>Descripción:</strong> <%= product.description %><br>
-            <strong>Unidades:</strong> <%= product.available_units %><br>
-            <strong>Precio:</strong> $<%= product.unit_price %>
+            <strong>Precio:</strong> 
+            <span class="h5 text-success">$<%= number_with_delimiter(product.unit_price) %></span><br>
+            <strong>Stock disponible:</strong> 
+            <span class="<%= product.available_units > 0 ? 'text-success' : 'text-danger' %>">
+              <%= product.available_units %> unidades
+            </span>
           </p>
-          <div class="btn-group" role="group">
-            <%= link_to 'Ver', product, class: 'btn btn-outline-primary btn-sm' %>
-            <%= link_to 'Editar', edit_product_path(product), class: 'btn btn-outline-secondary btn-sm' %>
-            <%= link_to 'Eliminar', product, method: :delete, 
-                        confirm: '¿Está seguro?', 
-                        class: 'btn btn-outline-danger btn-sm' %>
+          
+          <div class="mt-auto">
+            <% if product.available_units > 0 %>
+              <%= form_with url: add_to_cart_product_path(product), method: :post, local: true, class: 'd-flex align-items-center gap-2 mb-2' do |form| %>
+                <div class="input-group input-group-sm" style="max-width: 100px;">
+                  <%= form.number_field :quantity, 
+                                      value: 1, 
+                                      min: 1, 
+                                      max: product.available_units,
+                                      class: 'form-control text-center' %>
+                </div>
+                <%= form.submit 'Agregar al Carrito', 
+                               class: 'btn btn-warning flex-grow-1',
+                               data: { 
+                                 confirm: "¿Agregar #{form.object&.quantity || 1} unidad(es) de #{product.name} al carrito?"
+                               } %>
+              <% end %>
+            <% else %>
+              <button class="btn btn-secondary w-100 mb-2" disabled>
+                Sin Stock
+              </button>
+            <% end %>
+            
+            <div class="btn-group w-100" role="group">
+              <%= link_to 'Ver', product, class: 'btn btn-outline-primary btn-sm' %>
+              <%= link_to 'Editar', edit_product_path(product), class: 'btn btn-outline-secondary btn-sm' %>
+              <%= link_to 'Eliminar', product, 
+                         method: :delete, 
+                         confirm: '¿Está seguro?', 
+                         class: 'btn btn-outline-danger btn-sm' %>
+            </div>
           </div>
         </div>
       </div>
     </div>
   <% end %>
 </div>
+
+<% if @current_user&.shopping_cart&.items&.any? %>
+  <div class="fixed-bottom p-3">
+    <div class="container">
+      <div class="row justify-content-end">
+        <div class="col-md-4">
+          <div class="card border-success">
+            <div class="card-body text-center">
+              <h6 class="card-title">
+                <i class="bi bi-cart"></i> Carrito
+              </h6>
+              <p class="card-text mb-2">
+                <%= @current_user.shopping_cart.items.sum(:quantity) %> productos<br>
+                <strong>Total: $<%= number_with_delimiter(@current_user.shopping_cart.calculate_total) %></strong>
+              </p>
+              <%= link_to 'Ver Carrito', shopping_cart_path, 
+                         class: 'btn btn-success btn-sm w-100' %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

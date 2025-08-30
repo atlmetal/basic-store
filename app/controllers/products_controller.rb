@@ -3,9 +3,12 @@ class ProductsController < ApplicationController
 
   def index
     @products = current_store.products.all
+    @current_user = current_user
   end
 
-  def show; end
+  def show
+    @current_user = current_user
+  end
 
   def new
     @product = current_store.products.build
@@ -15,7 +18,7 @@ class ProductsController < ApplicationController
     @product = current_store.products.build(product_params)
 
     if @product.save
-      redirect_to @product, notice: 'Product created successfully.'
+      redirect_to @product, notice: 'Producto creado exitosamente.'
     else
       render :new
     end
@@ -25,7 +28,7 @@ class ProductsController < ApplicationController
 
   def update
     if @product.update(product_params)
-      redirect_to @product, notice: 'Product updated successfully.'
+      redirect_to @product, notice: 'Producto actualizado exitosamente.'
     else
       render :edit
     end
@@ -33,7 +36,18 @@ class ProductsController < ApplicationController
 
   def destroy
     @product.destroy
-    redirect_to products_url, notice: 'Product deleted successfully.'
+    redirect_to products_url, notice: 'Producto eliminado exitosamente.'
+  end
+
+  def add_to_cart
+    product = current_store.products.find(params[:id])
+    quantity = params[:quantity].to_i
+
+    if current_store.add_product_to_cart(current_user, product, quantity)
+      redirect_to products_path, notice: "#{product.name} agregado al carrito (#{quantity} unidades)"
+    else
+      redirect_to products_path, alert: 'No hay suficientes unidades disponibles'
+    end
   end
 
   private

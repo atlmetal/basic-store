@@ -1,67 +1,122 @@
-<h1>Mi Carrito</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h1>Mi Carrito de Compras</h1>
+  <%= link_to 'Seguir Comprando', products_path, class: 'btn btn-outline-primary' %>
+</div>
 
 <div class="row">
   <div class="col-md-8">
     <% if @shopping_cart.items.any? %>
       <div class="card">
         <div class="card-header">
-          <h5>Items en el Carrito</h5>
+          <h5>Productos en tu Carrito (<%= @shopping_cart.items.sum(:quantity) %> productos)</h5>
         </div>
         <div class="card-body">
           <% @shopping_cart.items.each do |item| %>
-            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-              <div>
-                <strong><%= item.product.name %></strong><br>
-                <small>SKU: <%= item.product.sku %> | Cantidad: <%= item.quantity %></small>
+            <div class="row align-items-center border-bottom py-3">
+              <div class="col-md-6">
+                <h6 class="mb-1"><%= item.product.name %></h6>
+                <small class="text-muted">
+                  SKU: <%= item.product.sku %> | 
+                  Precio unitario: $<%= number_with_delimiter(item.product.unit_price) %>
+                </small>
+                <% if item.product.sku.start_with?('SP') %>
+                  <br><small class="text-info">
+                    <i class="bi bi-tag"></i> Descuento especial aplicado
+                  </small>
+                <% elsif item.product.sku.start_with?('WE') %>
+                  <br><small class="text-info">
+                    <i class="bi bi-weight"></i> Precio por peso
+                  </small>
+                <% end %>
               </div>
-              <div class="text-end">
-                <span class="h6">$<%= item.calculate_total %></span><br>
-                <%= link_to 'Eliminar', remove_item_path(item), 
-                           method: :delete, 
-                           class: 'btn btn-sm btn-outline-danger' %>
+              
+              <div class="col-md-2 text-center">
+                <span class="fw-bold">Cantidad: <%= item.quantity %></span>
+                <% if item.product.sku.start_with?('WE') %>
+                  <br><small class="text-muted">(<%= item.quantity %>g)</small>
+                <% end %>
+              </div>
+              
+              <div class="col-md-2 text-center">
+                <span class="h6 text-success">
+                  $<%= number_with_delimiter(item.calculate_total.round(2)) %>
+                </span>
+              </div>
+              
+              <div class="col-md-2 text-center">
+                <%= link_to remove_item_path(item), 
+                           method: :delete,
+                           class: 'btn btn-outline-danger btn-sm',
+                           confirm: "¿Eliminar #{item.product.name} del carrito?",
+                           title: 'Eliminar del carrito' do %>
+                  <i class="bi bi-trash"></i> Eliminar
+                <% end %>
               </div>
             </div>
           <% end %>
-          
-          <div class="mt-3 text-end">
-            <h4>Total: $<%= @shopping_cart.calculate_total %></h4>
-            <%= link_to 'Finalizar Compra', shopping_cart_checkout_path, 
-                       method: :post, 
-                       class: 'btn btn-success btn-lg',
-                       confirm: '¿Confirma la compra?' %>
-          </div>
         </div>
       </div>
     <% else %>
-      <div class="alert alert-info">
-        El carrito está vacío
+      <div class="alert alert-info text-center">
+        <h4>Tu carrito está vacío</h4>
+        <p>¡Explora nuestros productos y encuentra algo increíble!</p>
+        <%= link_to 'Ver Productos', products_path, class: 'btn btn-primary' %>
       </div>
     <% end %>
   </div>
   
   <div class="col-md-4">
-    <div class="card">
-      <div class="card-header">
-        <h5>Agregar Producto</h5>
-      </div>
-      <div class="card-body">
-        <%= form_with url: shopping_cart_add_path, method: :post, local: true do |form| %>
-          <div class="mb-3">
-            <%= form.label :product_id, 'Producto:', class: 'form-label' %>
-            <%= form.select :product_id, 
-                           options_from_collection_for_select(@products, :id, :name), 
-                           { prompt: 'Seleccionar producto...' }, 
-                           { class: 'form-select' } %>
+    <% if @shopping_cart.items.any? %>
+      <div class="card">
+        <div class="card-header">
+          <h5>Resumen del Pedido</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between mb-2">
+            <span>Productos (<%= @shopping_cart.items.sum(:quantity) %>):</span>
+            <span>$<%= number_with_delimiter(@shopping_cart.calculate_total.round(2)) %></span>
+          </div>
+          <div class="d-flex justify-content-between mb-2">
+            <span>Envío:</span>
+            <span class="text-success">GRATIS</span>
+          </div>
+          <hr>
+          <div class="d-flex justify-content-between fw-bold h5">
+            <span>Total:</span>
+            <span class="text-success">$<%= number_with_delimiter(@shopping_cart.calculate_total.round(2)) %></span>
           </div>
           
-          <div class="mb-3">
-            <%= form.label :quantity, class: 'form-label' %>
-            <%= form.number_field :quantity, min: 1, value: 1, class: 'form-control' %>
-          </div>
-          
-          <%= form.submit 'Agregar al Carrito', class: 'btn btn-primary w-100' %>
-        <% end %>
+          <%= link_to shopping_cart_checkout_path, 
+                     method: :post, 
+                     class: 'btn btn-warning w-100 btn-lg mt-3',
+                     confirm: "¿Confirmar compra por $#{number_with_delimiter(@shopping_cart.calculate_total.round(2))}?" do %>
+            <i class="bi bi-credit-card"></i> Finalizar Compra
+          <% end %>
+        </div>
       </div>
-    </div>
+      
+      <div class="card mt-3">
+        <div class="card-header">
+          <h6>También te puede interesar</h6>
+        </div>
+        <div class="card-body">
+          <% suggested_products = @products.where.not(id: @shopping_cart.items.pluck(:product_id)).limit(2) %>
+          <% suggested_products.each do |product| %>
+            <div class="d-flex align-items-center mb-2 p-2 border rounded">
+              <div class="flex-grow-1">
+                <small class="fw-bold"><%= product.name %></small><br>
+                <small class="text-success">$<%= number_with_delimiter(product.unit_price) %></small>
+              </div>
+              <div>
+                <%= form_with url: add_to_cart_product_path(product), method: :post, local: true do |form| %>
+                  <%= form.hidden_field :quantity, value: 1 %>
+                  <%= form.submit '+', class: 'btn btn-outline-warning btn-sm' %>
+                <% end %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   </div>
 </div>
