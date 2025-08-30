@@ -22,7 +22,7 @@ class Store < ApplicationRecord
       shopping_cart.items.each do |item|
         product = item.product
         product.decrement_stock(item.quantity)
-        producto.save!
+        product.save!
       end
 
       self.total_sales += total_purchase

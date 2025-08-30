@@ -8,11 +8,11 @@ class User < ApplicationRecord
   after_create :create_shopping_cart
 
   def add_item_to_cart(product, quantity)
-    exist_item = shopping_cart.items.find_by(product: product)
+    existing_item = shopping_cart.items.find_by(product: product)
 
-    if exist_item
-      exist_item.quantity += quantity
-      exist_item.save
+    if existing_item
+      existing_item.quantity += quantity
+      existing_item.save
     else
       shopping_cart.items.create(product: product, quantity: quantity)
     end
@@ -24,7 +24,7 @@ class User < ApplicationRecord
 
   private
 
-  def create_cart
+  def create_shopping_cart
     create_shopping_cart
   end
 end

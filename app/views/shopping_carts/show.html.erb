@@ -16,7 +16,7 @@
               </div>
               <div class="text-end">
                 <span class="h6">$<%= item.calculate_total %></span><br>
-                <%= link_to 'Eliminar', shopping_cart_remove_item_path(item), 
+                <%= link_to 'Eliminar', remove_item_path(item), 
                            method: :delete, 
                            class: 'btn btn-sm btn-outline-danger' %>
               </div>
@@ -45,7 +45,7 @@
         <h5>Agregar Producto</h5>
       </div>
       <div class="card-body">
-        <%= form_with url: shopping_cart_add_item_path, method: :post, local: true do |form| %>
+        <%= form_with url: shopping_cart_add_path, method: :post, local: true do |form| %>
           <div class="mb-3">
             <%= form.label :product_id, 'Producto:', class: 'form-label' %>
             <%= form.select :product_id, 

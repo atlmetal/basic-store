@@ -1,0 +1,15 @@
+<div class="card">
+  <div class="card-header">
+    <h1><%= @product.name %></h1>
+  </div>
+  <div class="card-body">
+    <p><strong>SKU:</strong> <%= @product.sku %></p>
+    <p><strong>Descripcion:</strong> <%= @product.description %></p>
+    <p><strong>Unidades disponibles:</strong> <%= @product.available_units %></p>
+    <p><strong>Precio unitario:</strong> $<%= @product.unit_price %></p>
+  </div>
+  <div class="card-footer">
+    <%= link_to 'Edit', edit_product_path(@product), class: 'btn btn-primary' %>
+    <%= link_to 'Back', products_path, class: 'btn btn-secondary' %>
+  </div>
+</div>
