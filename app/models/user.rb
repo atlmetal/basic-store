@@ -25,6 +25,6 @@ class User < ApplicationRecord
   private
 
   def create_shopping_cart
-    create_shopping_cart
+    ShoppingCart.create(user: self)
   end
 end

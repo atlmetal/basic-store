@@ -86,10 +86,11 @@
             <span class="text-success">$<%= number_with_delimiter(@shopping_cart.calculate_total.round(2)) %></span>
           </div>
           
-          <%= link_to shopping_cart_checkout_path, 
-                     method: :post, 
-                     class: 'btn btn-warning w-100 btn-lg mt-3',
-                     confirm: "¿Confirmar compra por $#{number_with_delimiter(@shopping_cart.calculate_total.round(2))}?" do %>
+          <%= button_to shopping_cart_checkout_path, 
+              method: :post, 
+              class: 'btn btn-warning w-100 btn-lg mt-3',
+              confirm: "¿Confirmar compra por $#{number_with_delimiter(@shopping_cart.calculate_total.round(2))}?",
+              form: { style: "display: inline-block; width: 100%;" } do %>
             <i class="bi bi-credit-card"></i> Finalizar Compra
           <% end %>
         </div>

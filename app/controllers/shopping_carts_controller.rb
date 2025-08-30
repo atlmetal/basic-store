@@ -23,7 +23,7 @@ class ShoppingCartsController < ApplicationController
 
   def checkout
     begin
-      total = current_store.checkout(current_user)
+      total = current_store.finalize_purchase(current_user)
       redirect_to shopping_cart_path, notice: "Checkout completed. Total: $#{total}"
     rescue => e
       redirect_to shopping_cart_path, alert: "Error during checkout: #{e.message}"
